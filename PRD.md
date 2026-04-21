@@ -42,5 +42,5 @@ personas interesadas en adquirir vehículos nuevos o usados, clientes que desean
 -Formulario de contacto
 -Consulta directa sobre un vehículo específico 
 -Envío de mensajes al concesionario 
--Guardado debd de clientes
+-Guardado bd de clientes
 
