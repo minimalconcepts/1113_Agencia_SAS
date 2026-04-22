@@ -12,17 +12,19 @@
   <div id="filters">
     <select id="brandFilter">
       <option value="">All Brands</option>
-      <option value="Toyota">Toyota</option>
-      <option value="Ford">Ford</option>
+      <option value="Lamborghini">Lamborghini</option>
+      <option value="Ferrari">Ferrari</option>
+      <option value="Bugatti">Bugatti</option>
     </select>
 
     <select id="typeFilter">
       <option value="">All Types</option>
-      <option value="Sedan">Sedan</option>
-      <option value="SUV">SUV</option>
+      <option value="Deportivo">Deportivo</option>
     </select>
 
     <button onclick="applyFilters()">Filter</button>
+    <button onclick="ordenarPrecio()">Sort by Price</button>
+    <button onclick="reset()">Reset</button>
   </div>
 
   <div id="vehicle-list"></div>
