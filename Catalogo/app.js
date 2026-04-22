@@ -16,5 +16,14 @@ const catalogoAutos = [
     precio: 320000,
     color: "Amarillo",
     combustible: "Gasolina"
+  },
+  {
+    marca: "Ferrari",
+    modelo: "488 GTB",
+    año: 2019,
+    kilometraje: 12000,
+    precio: 250000,
+    color: "Rojo",
+    combustible: "Gasolina"
   }
 ];
