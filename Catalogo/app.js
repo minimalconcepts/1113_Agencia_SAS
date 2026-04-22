@@ -52,5 +52,14 @@ const catalogoAutos = [
     precio: 3000000,
     color: "Azul",
     combustible: "Gasolina"
+  },
+  {
+    marca: "Bugatti",
+    modelo: "Veyron",
+    año: 2017,
+    kilometraje: 10000,
+    precio: 1800000,
+    color: "Negro",
+    combustible: "Gasolina"
   }
 ];
