@@ -43,5 +43,14 @@ const catalogoAutos = [
     precio: 1500000,
     color: "Negro",
     combustible: "Híbrido"
+  },
+  {
+    marca: "Bugatti",
+    modelo: "Chiron",
+    año: 2021,
+    kilometraje: 1500,
+    precio: 3000000,
+    color: "Azul",
+    combustible: "Gasolina"
   }
 ];
