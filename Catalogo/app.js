@@ -31,15 +31,24 @@ function renderVehicles(list) {
 
   list.forEach(v => {
     container.innerHTML += `
-      <div class="card">
+      <div class="card" onclick='showDetails(${JSON.stringify(v)})'>
         <img src="${v.image}" width="100%">
         <h3>${v.brand} ${v.model}</h3>
         <p>Price: $${v.price}</p>
-        <p>Year: ${v.year}</p>
-        <p>Type: ${v.type}</p>
       </div>
     `;
   });
+}
+
+function showDetails(v) {
+  alert(
+`Brand: ${v.brand}
+Model: ${v.model}
+Fuel: ${v.fuel}
+Transmission: ${v.transmission}
+Mileage: ${v.mileage}
+Status: ${v.status}`
+  );
 }
 
 function applyFilters() {
