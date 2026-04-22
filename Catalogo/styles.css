@@ -1,3 +1,29 @@
-body { font-family: Arial; margin: 20px; }
-#vehicle-list { display: grid; grid-template-columns: repeat(3,1fr); gap: 15px; }
-.card { border: 1px solid #ccc; padding: 10px; }
+body { 
+  font-family: Arial; 
+  margin: 20px; 
+  background: #f5f5f5;
+}
+
+#vehicle-list { 
+  display: grid; 
+  grid-template-columns: repeat(3,1fr); 
+  gap: 15px; 
+}
+
+.card { 
+  border: 1px solid #ccc; 
+  padding: 15px; 
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+  margin: 0;
+}
+
+button {
+  margin-top: 5px;
+  padding: 5px;
+  cursor: pointer;
+}
