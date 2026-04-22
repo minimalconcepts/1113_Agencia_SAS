@@ -106,5 +106,14 @@ const catalogoAutos = [
     precio: 3500000,
     color: "Verde",
     combustible: "Híbrido"
+  },
+  {
+    marca: "Ferrari",
+    modelo: "SF90 Stradale",
+    año: 2022,
+    kilometraje: 1500,
+    precio: 450000,
+    color: "Rojo",
+    combustible: "Híbrido"
   }
 ];
