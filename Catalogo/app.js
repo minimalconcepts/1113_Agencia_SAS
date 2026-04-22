@@ -79,5 +79,14 @@ const catalogoAutos = [
     precio: 2200000,
     color: "Gris",
     combustible: "Gasolina"
+  },
+  {
+    marca: "Koenigsegg",
+    modelo: "Jesko",
+    año: 2022,
+    kilometraje: 1000,
+    precio: 3200000,
+    color: "Naranja",
+    combustible: "Gasolina"
   }
 ];
