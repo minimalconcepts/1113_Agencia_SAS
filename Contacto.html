@@ -2,114 +2,538 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Contacto - AutoLux</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
   <style>
-    .container {
-      max-width: 400px;
-      margin: auto;
-      padding: 20px;
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --card: #1e1e1e;
+      --border: rgba(255,255,255,0.07);
+      --red: #e8132a;
+      --red-glow: rgba(232, 19, 42, 0.25);
+      --green: #25D366;
+      --green-glow: rgba(37, 211, 102, 0.2);
+      --text: #f0f0f0;
+      --muted: #6b6b6b;
+      --input-bg: #252525;
     }
 
-    .form {
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Background texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(232,19,42,0.12) 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M0 0h1v1H0z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 52px 0 32px;
+      position: relative;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--red);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 16px var(--red-glow);
+    }
+
+    .logo-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--text);
+    }
+
+    .logo-text span {
+      color: var(--red);
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(42px, 12vw, 56px);
+      line-height: 0.95;
+      letter-spacing: 1px;
+      color: var(--text);
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--red);
+      display: block;
+    }
+
+    .subtitle {
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.5;
+    }
+
+    /* Decorative line */
+    .accent-line {
+      width: 40px;
+      height: 3px;
+      background: var(--red);
+      border-radius: 2px;
+      margin: 16px 0;
+      box-shadow: 0 0 12px var(--red-glow);
+    }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 20px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .field {
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+      transition: color 0.2s;
+    }
+
+    .field:focus-within label {
+      color: var(--red);
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1.5px solid transparent;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: #3a3a3a;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--red);
+      background: #2a2020;
+      box-shadow: 0 0 0 3px var(--red-glow);
+    }
+
+    .field input.error,
+    .field textarea.error {
+      border-color: #ff6b6b;
+      box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
+      animation: shake 0.35s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .field textarea {
+      resize: none;
+      height: 110px;
+      line-height: 1.5;
+    }
+
+    .field-icon {
+      position: absolute;
+      right: 14px;
+      top: 38px;
+      font-size: 16px;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-send {
+      width: 100%;
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px var(--red-glow);
+      margin-top: 6px;
+    }
+
+    .btn-send::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.08), transparent);
+      pointer-events: none;
+    }
+
+    .btn-send:active {
+      transform: scale(0.97);
+      box-shadow: 0 2px 12px var(--red-glow);
+    }
+
+    .btn-send.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .btn-send .btn-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .btn-send.loading .spinner { display: block; }
+    .btn-send.loading .btn-label { display: none; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider-text {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ── WHATSAPP ── */
+    .btn-whatsapp {
+      width: 100%;
+      background: transparent;
+      border: 1.5px solid var(--green);
+      border-radius: 14px;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--green);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 0 0 transparent;
+    }
+
+    .btn-whatsapp:active {
+      transform: scale(0.97);
+      background: rgba(37, 211, 102, 0.06);
+      box-shadow: 0 0 16px var(--green-glow);
+    }
+
+    .wa-icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e2a1e;
+      border: 1px solid rgba(37,211,102,0.3);
+      color: var(--green);
+      padding: 14px 24px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 999;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .toast.show {
+      bottom: 36px;
+    }
+
+    /* ── INFO STRIP ── */
+    .info-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .info-pill {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 12px;
+      display: flex;
+      align-items: center;
       gap: 10px;
     }
 
-    .form input,
-    .form textarea {
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      outline: none;
+    .info-pill-icon {
+      font-size: 18px;
+      flex-shrink: 0;
     }
 
-    .form textarea {
-      resize: none;
-      height: 100px;
+    .info-pill-text {
+      font-size: 11px;
+      line-height: 1.4;
     }
 
-    .btn {
-      background: red;
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .whatsapp {
-      background: green;
-      text-align: center;
+    .info-pill-label {
+      color: var(--muted);
       display: block;
-      margin-top: 10px;
-      text-decoration: none;
-      color: white;
-      padding: 12px;
-      border-radius: 8px;
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
-    header {
-      text-align: center;
-      padding: 15px;
+    .info-pill-value {
+      color: var(--text);
+      font-weight: 500;
+      font-size: 12px;
+    }
+
+    /* ── ANIMATIONS ── */
+    .page > * {
+      animation: fadeUp 0.5s ease both;
+    }
+
+    header { animation-delay: 0s; }
+    .form-card { animation-delay: 0.1s; }
+    .divider { animation-delay: 0.15s; }
+    .btn-whatsapp { animation-delay: 0.18s; }
+    .info-strip { animation-delay: 0.22s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
-
 <body>
 
-<header>
-  <h1>Contáctanos 📩</h1>
-</header>
+<div class="page">
 
-<div class="container">
-  
-  <form class="form" id="formulario">
-    <input type="text" id="nombre" placeholder="Nombre" required>
-    <input type="email" id="correo" placeholder="Correo" required>
-    <textarea id="mensaje" placeholder="Mensaje" required></textarea>
-    <button class="btn">Enviar</button>
-  </form>
+  <header>
+    <div class="logo-row">
+      <div class="logo-icon">🚗</div>
+      <div class="logo-text">AUTO<span>LUX</span></div>
+    </div>
+    <h1>HABLEMOS<em>HOY</em></h1>
+    <div class="accent-line"></div>
+    <p class="subtitle">Respondemos en menos de 2 horas. Cuéntanos qué necesitas.</p>
+  </header>
 
-  <a id="whatsappBtn" class="whatsapp" target="_blank">
-    Contactar por WhatsApp 📱
+  <div class="form-card">
+    <form id="formulario" novalidate>
+
+      <div class="field">
+        <label for="nombre">Tu nombre</label>
+        <input type="text" id="nombre" placeholder="Ej: Carlos Ramírez" autocomplete="name" inputmode="text">
+        <span class="field-icon">👤</span>
+      </div>
+
+      <div class="field">
+        <label for="correo">Correo electrónico</label>
+        <input type="email" id="correo" placeholder="correo@ejemplo.com" autocomplete="email" inputmode="email">
+        <span class="field-icon">✉️</span>
+      </div>
+
+      <div class="field">
+        <label for="mensaje">Tu mensaje</label>
+        <textarea id="mensaje" placeholder="¿En qué vehículo estás interesado? ¿Tienes alguna consulta?"></textarea>
+      </div>
+
+      <button type="submit" class="btn-send" id="btnEnviar">
+        <div class="btn-content">
+          <div class="spinner"></div>
+          <span class="btn-label">ENVIAR MENSAJE →</span>
+        </div>
+      </button>
+
+    </form>
+  </div>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <span class="divider-text">o escríbenos directo</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <a id="whatsappBtn" class="btn-whatsapp" href="https://wa.me/573001234567" target="_blank" rel="noopener">
+    <span class="wa-icon">💬</span>
+    Contactar por WhatsApp
   </a>
+
+  <div class="info-strip">
+    <div class="info-pill">
+      <span class="info-pill-icon">📍</span>
+      <div class="info-pill-text">
+        <span class="info-pill-label">Ubicación</span>
+        <span class="info-pill-value">Bogotá, Col.</span>
+      </div>
+    </div>
+    <div class="info-pill">
+      <span class="info-pill-icon">🕐</span>
+      <div class="info-pill-text">
+        <span class="info-pill-label">Horario</span>
+        <span class="info-pill-value">8am – 7pm</span>
+      </div>
+    </div>
+  </div>
 
 </div>
 
+<!-- Toast -->
+<div class="toast" id="toast">✅ Mensaje enviado correctamente</div>
+
 <script>
-const form = document.getElementById("formulario");
-const whatsappBtn = document.getElementById("whatsappBtn");
+  const form = document.getElementById("formulario");
+  const whatsappBtn = document.getElementById("whatsappBtn");
+  const btnEnviar = document.getElementById("btnEnviar");
+  const toast = document.getElementById("toast");
 
-form.addEventListener("submit", function(e) {
-  e.preventDefault();
-
-  const nombre = document.getElementById("nombre").value.trim();
-  const correo = document.getElementById("correo").value.trim();
-  const mensaje = document.getElementById("mensaje").value.trim();
-
-  if (!nombre || !correo || !mensaje) {
-    alert("Por favor completa todos los campos ❌");
-    return;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3200);
   }
 
-  // Simulación de envío
-  alert("Mensaje enviado correctamente 🚀");
+  function setError(id) {
+    const el = document.getElementById(id);
+    el.classList.add("error");
+    el.addEventListener("input", () => el.classList.remove("error"), { once: true });
+  }
 
-  // Crear mensaje para WhatsApp
-  const texto = `Hola, soy ${nombre}. Mi correo es ${correo}. ${mensaje}`;
-  const url = `https://wa.me/573001234567?text=${encodeURIComponent(texto)}`;
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  whatsappBtn.href = url;
+    const nombre = document.getElementById("nombre").value.trim();
+    const correo = document.getElementById("correo").value.trim();
+    const mensaje = document.getElementById("mensaje").value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  // Opcional: abrir WhatsApp automáticamente
-  window.open(url, "_blank");
+    let valid = true;
+    if (!nombre) { setError("nombre"); valid = false; }
+    if (!correo || !emailRegex.test(correo)) { setError("correo"); valid = false; }
+    if (!mensaje) { setError("mensaje"); valid = false; }
+    if (!valid) return;
 
-  form.reset();
-});
+    // Loading state
+    btnEnviar.classList.add("loading");
+
+    // Simulate async send (replace with real fetch)
+    await new Promise(r => setTimeout(r, 1400));
+
+    btnEnviar.classList.remove("loading");
+
+    // Build WhatsApp link with form data
+    const texto = `Hola, soy ${nombre}. Mi correo es ${correo}.\n\n${mensaje}`;
+    const waUrl = `https://wa.me/573001234567?text=${encodeURIComponent(texto)}`;
+    whatsappBtn.href = waUrl;
+
+    showToast("✅ Mensaje enviado. ¡Te contactamos pronto!");
+    form.reset();
+  });
 </script>
 
 </body>
