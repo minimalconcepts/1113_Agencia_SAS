@@ -24,3 +24,22 @@ const vehicles = [
     image: "https://via.placeholder.com/150"
   }
 ];
+
+function renderVehicles(list) {
+  const container = document.getElementById("vehicle-list");
+  container.innerHTML = "";
+
+  list.forEach(v => {
+    container.innerHTML += `
+      <div class="card">
+        <img src="${v.image}" width="100%">
+        <h3>${v.brand} ${v.model}</h3>
+        <p>Price: $${v.price}</p>
+        <p>Year: ${v.year}</p>
+        <p>Type: ${v.type}</p>
+      </div>
+    `;
+  });
+}
+
+renderVehicles(vehicles);
