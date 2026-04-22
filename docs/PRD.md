@@ -1,46 +1,70 @@
-## Descripción
-Plataforma web para concesionario automotriz multimarca que permite a los usuarios explorar vehículos de diferentes fabricantes,comparar opciones y contactar  con el concesionario para el proceso de compra. 
+## Descripcion
+Aplicacion web educativa de tipo catalogo para un concesionario ficticio de autos deportivos y de lujo.
+
+El sistema permitira a los estudiantes mostrar vehiculos en pantalla y filtrarlos usando logica basica en `JavaScript`.
 
 ## Objetivo
-Brindar una herramienta digital que facilite la visualización, comparación y selección de vehículos de múltiples marcas, optimizando la experiencia del cliente y apoyando el proceso de venta. 
+Construir un proyecto inicial que permita practicar fundamentos de programacion web mediante una interfaz sencilla, clara y funcional.
 
-## Usuarios 
-personas interesadas en adquirir vehículos nuevos o usados, clientes que desean comparar marcas antes de comprar y los usuarios que buscan información detallada de vehículos.  
+## Usuarios
+- estudiantes que estan aprendiendo JavaScript
+- personas que desean explorar un catalogo de vehiculos
+- usuarios que quieren filtrar autos segun criterios basicos
 
-## Funcionalidades
-### Catálogo de vehículos 
--visualización de vehículos disponibles de distintas marcas
--filtros avanzados 
-   -Marca
-   -Modelo
-   -Precio
-   -Año
- -Tipo de vehiculo(suv,sedan,etc)
--listado con imagen,precio y características principales
-### Detalles del vehículo
--Información completa:
-  -Marca y Modelo
-  -Tipo de combustible 
-  -Transmisión
-  -kilometraje(si aplica)
--Galeria de imagenes
--Estado(nuevo o usado)
-### Comparador de vehículos
--Selección de dos o más vehículos 
--Comparación de:
-   -precio
-   -características técnicas
-   -consumo
-### Sistema de favoritos
--Guardar vehiculos de interés 
--Acceso rápido a vehículos seleccionados
-### Panel de usuario
--Registro e inicio de sesión 
--Gestión de favoritos
--Historial de solicitudes y consultas 
-### Contacto con asesor comercial 
--Formulario de contacto
--Consulta directa sobre un vehículo específico 
--Envío de mensajes al concesionario 
--Guardado bd de clientes
+## Alcance Del MVP
+### Catalogo de vehiculos
+- visualizacion de una lista de autos disponible
+- cada tarjeta debe mostrar:
+  - marca
+  - modelo
+  - precio
+  - imagen
 
+### Filtros basicos
+- filtro por marca
+- filtro por tipo de vehiculo
+- boton para aplicar filtros
+- opcion para mostrar mensaje si no hay coincidencias
+
+### Comportamiento esperado
+- los autos deben cargarse desde un arreglo de objetos en JavaScript
+- el catalogo debe renderizarse dinamicamente en pantalla
+- al aplicar filtros, la lista debe actualizarse sin recargar la pagina
+
+## Datos Minimos Por Vehiculo
+- id
+- marca
+- modelo
+- tipo
+- precio
+- imagen
+
+## Fuera De Alcance En Esta Etapa
+Estas funcionalidades no forman parte del MVP inicial:
+- registro e inicio de sesion
+- panel de usuario
+- favoritos
+- comparador de vehiculos
+- historial de consultas
+- formulario conectado a base de datos
+- backend o persistencia real
+
+## Criterios De Exito
+- el catalogo se muestra correctamente al abrir la pagina
+- los filtros funcionan con los datos cargados
+- la interfaz es entendible y usable
+- el proyecto demuestra manejo basico de DOM, eventos, arrays y objetos
+
+## Enfoque Pedagogico
+El proyecto debe priorizar comprension antes que complejidad.
+
+La meta principal es que los estudiantes entiendan:
+- como representar datos con objetos
+- como recorrer arreglos
+- como filtrar informacion
+- como insertar contenido en el DOM
+- como responder a eventos del usuario
+
+---
+
+by el profe Henry O. Kyrbot: con carino, para que aprendan a programar con cabeza, corazon y sin miedo a equivocarse

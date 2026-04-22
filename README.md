@@ -1,52 +1,50 @@
-# Car dealer motorsport
-
+# Car Dealer Motorsport
 
 ## Descripcion
-una agencia fictisia dedicada a la venta de los autos mas exclusivos y rapidos de varias marcas y categorias, tanto vehiculos de segunda modificados de la forma mas agresiva como de agencia permitiendo a los usuarios explorar diversas opciones segun sus preferencias.
+Proyecto educativo desarrollado por estudiantes de Mecatronica 1113 para practicar los fundamentos de desarrollo web con `HTML`, `CSS` y `JavaScript`.
 
+La aplicacion representa un catalogo de autos deportivos y de alta gama, permitiendo mostrar vehiculos en pantalla y aplicar filtros basicos segun las preferencias del usuario.
 
-##  Objetivo
-aplicar los conocimientos de los lenguajes de programacion **HTML,javascript y CSS** para crear una interfaz atractiva y funcional.
+## Objetivo
+Aplicar conceptos iniciales de programacion web mediante la construccion de una interfaz simple, visual y funcional.
 
+Este proyecto busca reforzar:
+- estructura de paginas con `HTML`
+- estilos con `CSS`
+- logica e interactividad con `JavaScript`
+- trabajo colaborativo con `Git` y `GitHub`
 
-## funcionalidades
+## Funcionalidades Del MVP
+- visualizacion de autos en un catalogo
+- renderizado dinamico de datos desde JavaScript
+- filtros basicos por marca y tipo
+- visualizacion de imagen, modelo y precio
+- mensaje cuando no existan resultados
 
-
-- Visualizacion de autos nuevos, usados y modificados
-- catalogo dividido en categorias
-- interfaz facil e intuitiva por el ususario
-
-
-## Recursos utilizados
+## Tecnologias Utilizadas
 - HTML5
-- CSS
-- javascript
-- github
+- CSS3
+- JavaScript
 - Git
-- Visual Studio
-- tailwind
-- chadcn
+- GitHub
+- Visual Studio Code
 
+## Alcance Actual
+Este proyecto corresponde a una primera etapa de aprendizaje.
 
-## Avisos importantes
-
-
-si la interfaz tienen errores es culpa de gamboa
-
-
-en caso de errores contactese con el lider del grupo
-
+Por ahora el objetivo NO es construir una plataforma completa de concesionario, sino una base solida para practicar:
+- arrays y objetos
+- funciones
+- eventos
+- manipulacion del DOM
+- renderizado de informacion en pantalla
 
 ## Integrantes
-
-
 - Oscar Garcia
 - Gelves
 - Juan Gamboa
 - Angel Arias
 
+---
 
-
-
-
-
+by el profe Henry O. Kyrbot: con carino, para que aprendan a programar con cabeza, corazon y sin miedo a equivocarse
