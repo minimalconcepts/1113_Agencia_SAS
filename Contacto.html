@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contacto - AutoLux</title>
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    .container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .form input,
+    .form textarea {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .form textarea {
+      resize: none;
+      height: 100px;
+    }
+
+    .btn {
+      background: red;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .whatsapp {
+      background: green;
+      text-align: center;
+      display: block;
+      margin-top: 10px;
+      text-decoration: none;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    header {
+      text-align: center;
+      padding: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Contáctanos 📩</h1>
+</header>
+
+<div class="container">
+  
+  <form class="form" id="formulario">
+    <input type="text" id="nombre" placeholder="Nombre" required>
+    <input type="email" id="correo" placeholder="Correo" required>
+    <textarea id="mensaje" placeholder="Mensaje" required></textarea>
+    <button class="btn">Enviar</button>
+  </form>
+
+  <a id="whatsappBtn" class="whatsapp" target="_blank">
+    Contactar por WhatsApp 📱
+  </a>
+
+</div>
+
+<script>
+const form = document.getElementById("formulario");
+const whatsappBtn = document.getElementById("whatsappBtn");
+
+form.addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const nombre = document.getElementById("nombre").value.trim();
+  const correo = document.getElementById("correo").value.trim();
+  const mensaje = document.getElementById("mensaje").value.trim();
+
+  if (!nombre || !correo || !mensaje) {
+    alert("Por favor completa todos los campos ❌");
+    return;
+  }
+
+  // Simulación de envío
+  alert("Mensaje enviado correctamente 🚀");
+
+  // Crear mensaje para WhatsApp
+  const texto = `Hola, soy ${nombre}. Mi correo es ${correo}. ${mensaje}`;
+  const url = `https://wa.me/573001234567?text=${encodeURIComponent(texto)}`;
+
+  whatsappBtn.href = url;
+
+  // Opcional: abrir WhatsApp automáticamente
+  window.open(url, "_blank");
+
+  form.reset();
+});
+</script>
+
+</body>
+</html>
