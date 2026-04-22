@@ -115,5 +115,14 @@ const catalogoAutos = [
     precio: 450000,
     color: "Rojo",
     combustible: "Híbrido"
+  },
+  {
+    marca: "Bugatti",
+    modelo: "Divo",
+    año: 2021,
+    kilometraje: 800,
+    precio: 5000000,
+    color: "Azul",
+    combustible: "Gasolina"
   }
 ];
