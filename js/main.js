@@ -1,20 +1,34 @@
-function mostrarInicio() {
-    document.getElementById("contenido").innerHTML = "<h2>Bienvenido</h2>";
-}
+let autos = []; // Aquí tus compañeros cargarán datos
 
-function mostrarCatalogo() {
-    document.getElementById("contenido").innerHTML = "<h2>Catálogo</h2>";
-}
+function renderAutos(lista) {
+    const contenedor = document.getElementById("vehicle-list");
+    contenedor.innerHTML = "";
 
-function mostrarContacto() {
-    document.getElementById("contenido").innerHTML = "<h2>Contacto</h2>";
+    lista.forEach(auto => {
+        contenedor.innerHTML += `
+            <div>
+                <h3>${auto.marca}</h3>
+                <p>${auto.tipo}</p>
+                <p>$${auto.precio}</p>
+            </div>
+        `;
+    });
 }
 
 function applyFilters() {
-    alert("Filtros aplicados (lógica vendrá después)");
+    let marca = document.getElementById("brandFilter").value;
+    let tipo = document.getElementById("typeFilter").value;
+
+    let filtrados = autos.filter(auto => {
+        return (!marca || auto.marca === marca) &&
+               (!tipo || auto.tipo === tipo);
+    });
+
+    renderAutos(filtrados);
 }
 
 function reset() {
     document.getElementById("brandFilter").value = "";
     document.getElementById("typeFilter").value = "";
+    renderAutos(autos);
 }
