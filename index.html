@@ -17,6 +17,25 @@
 
     <div id="contenido"></div>
 
+    <div id="filtros">
+        <select id="brandFilter">
+            <option value="">Todas las marcas</option>
+            <option value="Lamborghini">Lamborghini</option>
+            <option value="Ferrari">Ferrari</option>
+            <option value="Bugatti">Bugatti</option>
+        </select>
+
+        <select id="typeFilter">
+            <option value="">Todos los tipos</option>
+            <option value="Deportivo">Deportivo</option>
+        </select>
+
+        <button onclick="applyFilters()">Filtrar</button>
+        <button onclick="reset()">Reset</button>
+    </div>
+
+    <div id="vehicle-list"></div>
+
     <script src="app.js"></script>
 </body>
 </html>
