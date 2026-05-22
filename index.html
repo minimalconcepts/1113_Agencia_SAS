@@ -17,9 +17,9 @@
       display: grid;
       place-items: center;
       background:
-        radial-gradient(circle at 50% 74%, rgba(168, 85, 247, 0.32), transparent 32%),
-        radial-gradient(circle at 16% 18%, rgba(126, 34, 206, 0.32), transparent 28%),
-        linear-gradient(135deg, #020104 0%, #09030f 42%, #180526 72%, #020104 100%);
+        radial-gradient(circle at 52% 76%, rgba(201, 162, 83, 0.24), transparent 34%),
+        radial-gradient(circle at 16% 18%, rgba(128, 128, 128, 0.24), transparent 30%),
+        linear-gradient(135deg, #020202 0%, #0b0b0b 40%, #2a2926 72%, #050505 100%);
       transition: opacity 1.05s ease, visibility 1.05s ease;
       isolation: isolate;
       will-change: opacity;
@@ -36,7 +36,7 @@
 
     #intro-layer::before {
       background:
-        linear-gradient(90deg, transparent, rgba(255, 89, 105, 0.14), transparent),
+        linear-gradient(90deg, transparent, rgba(214, 176, 96, 0.18), transparent),
         repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 4px);
       mix-blend-mode: screen;
       opacity: 0.34;
@@ -158,8 +158,8 @@
       animation: logoReveal 1.45s cubic-bezier(0.19, 1, 0.22, 1) forwards;
       text-shadow:
         0 0 18px rgba(255, 255, 255, 0.34),
-        0 0 34px rgba(168, 85, 247, 0.95),
-        0 0 72px rgba(126, 34, 206, 0.72),
+        0 0 34px rgba(214, 176, 96, 0.82),
+        0 0 72px rgba(120, 120, 120, 0.58),
         0 22px 28px rgba(0, 0, 0, 0.95);
     }
 
@@ -168,7 +168,7 @@
       display: inline-block;
       margin: 0 0.04em;
       text-shadow: 0 0 18px rgba(255, 89, 105, 0.9),
-                   0 0 38px rgba(168, 85, 247, 0.58);
+                   0 0 38px rgba(214, 176, 96, 0.38);
     }
 
     .intro-tagline {
@@ -198,7 +198,7 @@
       width: 100%;
       height: 100%;
       border-radius: inherit;
-      background: linear-gradient(90deg, #ff5969, #ffffff);
+      background: linear-gradient(90deg, #d6b060, #f5f0df);
       transform: translateX(-100%);
       animation: introProgress 4.8s ease-out forwards;
     }
@@ -223,8 +223,8 @@
     }
 
     .intro-skip:hover {
-      border-color: #ff5969;
-      background: rgba(255, 89, 105, 0.18);
+      border-color: #d6b060;
+      background: rgba(214, 176, 96, 0.16);
     }
 
     .fade-out {
@@ -238,7 +238,7 @@
     }
     
     .magic-burst-btn.active-purple {
-      background-color: #ff5969 !important;
+      background-color: #d6b060 !important;
       color: #ffffff !important;
     }
     .magic-burst-btn.active-purple small,
@@ -392,7 +392,7 @@
 
       cameraTarget = new THREE.Vector3(0, 0.56, 0);
       scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x050208, 0.055);
+      scene.fog = new THREE.FogExp2(0x050505, 0.055);
 
       camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 100);
       renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
@@ -404,7 +404,7 @@
       renderer.shadowMap.enabled = false;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-      const ambientLight = new THREE.AmbientLight(0x6b3ca8, 0.55);
+      const ambientLight = new THREE.AmbientLight(0x6f6a60, 0.58);
       scene.add(ambientLight);
 
       const keyLight = new THREE.SpotLight(0xffffff, 3.2, 18, Math.PI / 5.5, 0.36, 1.15);
@@ -413,17 +413,17 @@
       keyLight.shadow.mapSize.set(1024, 1024);
       scene.add(keyLight);
 
-      const rimLight = new THREE.SpotLight(0xa855f7, 5.2, 20, Math.PI / 4, 0.42, 1.1);
+      const rimLight = new THREE.SpotLight(0xd6b060, 5.0, 20, Math.PI / 4, 0.42, 1.1);
       rimLight.position.set(4.8, 3.2, -3.8);
       scene.add(rimLight);
 
-      const sideLight = new THREE.PointLight(0xff5969, 1.6, 9);
+      const sideLight = new THREE.PointLight(0xf1d58b, 1.45, 9);
       sideLight.position.set(-4.8, 1.1, -1.8);
       scene.add(sideLight);
 
       const floorGeo = new THREE.PlaneGeometry(40, 40);
       const floorMat = new THREE.MeshStandardMaterial({
-        color: 0x06020a,
+        color: 0x050505,
         roughness: 0.24,
         metalness: 0.18,
         transparent: true,
@@ -435,7 +435,7 @@
       floor.receiveShadow = true;
       scene.add(floor);
 
-      const grid = new THREE.GridHelper(34, 34, 0x7e22ce, 0x261032);
+      const grid = new THREE.GridHelper(34, 34, 0xd6b060, 0x2f2f2f);
       grid.material.transparent = true;
       grid.material.opacity = 0.2;
       grid.position.y = 0.01;
@@ -452,7 +452,7 @@
       }
       smokeGeo.setAttribute('position', new THREE.BufferAttribute(smokePositions, 3));
       const smokeMat = new THREE.PointsMaterial({
-        color: 0xa855f7,
+        color: 0x8f8a7f,
         size: 0.11,
         transparent: true,
         opacity: 0.34,
@@ -581,10 +581,86 @@
           child.receiveShadow = true;
 
           if (child.material) {
-            child.material.envMapIntensity = 1.35;
+            const materialName = `${child.material.name || ''} ${child.name || ''}`.toLowerCase();
+            const isGlass = materialName.includes('glass') || materialName.includes('window');
+            const isWheel = materialName.includes('wheel') || materialName.includes('tire') || materialName.includes('rim');
+            const isLight = materialName.includes('light') || materialName.includes('lamp');
+
+            child.material = child.material.clone();
+            child.material.envMapIntensity = 1.55;
+
+            if (isGlass) {
+              child.material.color?.setHex(0x050505);
+              child.material.metalness = 0.18;
+              child.material.roughness = 0.16;
+              child.material.transparent = true;
+              child.material.opacity = 0.72;
+            } else if (isWheel) {
+              child.material.color?.setHex(0x020202);
+              child.material.metalness = 0.72;
+              child.material.roughness = 0.28;
+            } else if (isLight) {
+              child.material.color?.setHex(0xf5f0df);
+              child.material.emissive?.setHex(0xd6b060);
+              child.material.emissiveIntensity = 0.42;
+            } else {
+              child.material.color?.setHex(0x030303);
+              child.material.metalness = 0.82;
+              child.material.roughness = 0.18;
+            }
+
             child.material.needsUpdate = true;
           }
         });
+
+        addGt3InspiredDetails(model);
+      }
+
+      function addGt3InspiredDetails(model) {
+        const darkCarbon = new THREE.MeshStandardMaterial({
+          color: 0x020202,
+          metalness: 0.68,
+          roughness: 0.24
+        });
+        const goldAccent = new THREE.MeshStandardMaterial({
+          color: 0xd6b060,
+          metalness: 0.9,
+          roughness: 0.22
+        });
+        const headlightGlow = new THREE.MeshStandardMaterial({
+          color: 0xf5f0df,
+          emissive: 0xd6b060,
+          emissiveIntensity: 0.7,
+          metalness: 0.1,
+          roughness: 0.18
+        });
+
+        const wingBar = new THREE.Mesh(new THREE.BoxGeometry(2.05, 0.08, 0.28), darkCarbon);
+        wingBar.position.set(0, 1.08, -1.38);
+        wingBar.rotation.x = -0.08;
+        model.add(wingBar);
+
+        [-0.88, 0.88].forEach((x) => {
+          const wingPost = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.58, 0.08), darkCarbon);
+          wingPost.position.set(x, 0.78, -1.28);
+          model.add(wingPost);
+        });
+
+        const frontLip = new THREE.Mesh(new THREE.BoxGeometry(2.15, 0.08, 0.2), darkCarbon);
+        frontLip.position.set(0, 0.08, 1.58);
+        model.add(frontLip);
+
+        [-0.68, 0.68].forEach((x) => {
+          const headlight = new THREE.Mesh(new THREE.SphereGeometry(0.16, 24, 16), headlightGlow);
+          headlight.scale.set(1.05, 0.56, 0.28);
+          headlight.position.set(x, 0.48, 1.5);
+          model.add(headlight);
+        });
+
+        const hoodBadge = new THREE.Mesh(new THREE.SphereGeometry(0.055, 18, 12), goldAccent);
+        hoodBadge.scale.set(0.72, 0.12, 1);
+        hoodBadge.position.set(0, 0.55, 1.18);
+        model.add(hoodBadge);
       }
 
       function startFallBackIntro() {
