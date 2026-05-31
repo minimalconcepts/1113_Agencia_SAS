@@ -8,6 +8,7 @@ Cada pieza puede tener:
 
 - Datos basicos.
 - Imagen.
+- URL oficial o referencia.
 - Historia.
 - Datos para el comparador.
 - Informacion para el apartado "Para aprender".
@@ -44,11 +45,39 @@ Cada pieza debe tener como minimo:
   type: "Caza multiusos",
   year: "2010",
   detail: "Servicio militar moderno",
-  image: "assets/images/aviones/combate/F-35-Lightning-II.jpg"
+  image: "assets/images/aviones/combate/F-35-Lightning-II.jpg",
+  url_referencia: "https://www.lockheedmartin.com/en-us/products/f-35.html"
 }
 ```
 
-## 3. Como agregar la historia
+## 3. Como agregar una URL de referencia
+
+Usa el campo `url_referencia`.
+
+Ejemplo para un auto:
+
+```js
+{
+  name: "Ferrari F40",
+  type: "Superdeportivo",
+  year: "1987",
+  detail: "$1,500,000 aprox.",
+  image: "assets/images/autos/superdeportivos/Ferrari-F40.jpg",
+  url_referencia: "https://www.ferrari.com/es-ES/auto/f40"
+}
+```
+
+Cuando una pieza tiene `url_referencia`, la ficha tipo wiki muestra un boton llamado `Referencia`.
+
+Tambien se aceptan estos nombres si vienen desde la API:
+
+```js
+urlReferencia: "https://..."
+officialUrl: "https://..."
+referenceUrl: "https://..."
+```
+
+## 4. Como agregar la historia
 
 La historia se agrega con `history`.
 
@@ -64,7 +93,7 @@ history: [
 
 Esto ayuda a que la ficha no se vea como un bloque gigante de texto.
 
-## 4. Como llenar el comparador
+## 5. Como llenar el comparador
 
 El comparador usa un objeto llamado `specs`.
 
@@ -92,7 +121,7 @@ Campos disponibles:
 
 Si un dato no se conoce, se puede dejar sin poner. La pagina mostrara `Pendiente`.
 
-## 5. Apartado "Para aprender"
+## 6. Apartado "Para aprender"
 
 Por ahora el apartado "Para aprender" muestra puntos generales automaticamente.
 
@@ -123,7 +152,7 @@ Campos sugeridos:
 - `funFact`: dato curioso.
 - `summary`: resumen corto para recordar.
 
-## 6. Ejemplo completo
+## 7. Ejemplo completo
 
 ```js
 {
@@ -132,6 +161,7 @@ Campos sugeridos:
   year: "2010",
   detail: "Servicio militar moderno",
   image: "assets/images/aviones/combate/F-35-Lightning-II.jpg",
+  url_referencia: "https://www.lockheedmartin.com/en-us/products/f-35.html",
   specs: {
     creator: "Lockheed Martin",
     power: "Motor Pratt & Whitney F135",
@@ -155,11 +185,13 @@ Campos sugeridos:
 }
 ```
 
-## 7. Recomendaciones
+## 8. Recomendaciones
 
 - No borres las comas entre objetos.
 - Usa comillas en textos.
 - No pegues etiquetas HTML dentro de `history`.
 - Escribe textos cortos por parrafo.
 - Verifica que la imagen exista en la carpeta correcta.
+- Usa URLs de fuentes confiables: pagina oficial, Wikipedia, fabricante, museo o ficha tecnica.
+- No uses enlaces de redes sociales como fuente principal si existe una pagina oficial.
 - Si algo se rompe, revisa primero comas, comillas y llaves.

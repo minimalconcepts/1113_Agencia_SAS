@@ -3,13 +3,17 @@
   --bg: #f3f0ea;
   --surface: #ffffff;
   --surface-soft: #faf8f3;
+  --surface-glass: rgba(255, 255, 255, 0.86);
   --ink: #1d1d1d;
   --muted: #68645d;
   --line: #d8d0c2;
   --red: #b7192c;
+  --red-soft: rgba(183, 25, 44, 0.12);
   --header-bg: #191919;
   --image-bg: #e7e1d5;
   --shadow: 0 14px 34px rgba(29, 29, 29, 0.12);
+  --shadow-soft: 0 8px 22px rgba(29, 29, 29, 0.08);
+  --radius: 8px;
 }
 
 /* === Tema claro/oscuro === */
@@ -17,13 +21,16 @@
   --bg: #111111;
   --surface: #1d1c1a;
   --surface-soft: #171614;
+  --surface-glass: rgba(29, 28, 26, 0.88);
   --ink: #f6f2ea;
   --muted: #bbb2a7;
   --line: #3b362f;
   --red: #ff5969;
+  --red-soft: rgba(255, 89, 105, 0.14);
   --header-bg: #080808;
   --image-bg: #2a2722;
   --shadow: 0 16px 38px rgba(0, 0, 0, 0.38);
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.28);
 }
 
 * {
@@ -32,7 +39,9 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg), white 16%), var(--bg) 340px),
+    var(--bg);
   color: var(--ink);
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1.5;
@@ -84,9 +93,11 @@ h2 {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: var(--header-bg);
+  background: color-mix(in srgb, var(--header-bg), transparent 4%);
   color: white;
-  border-bottom: 5px solid var(--red);
+  border-bottom: 1px solid color-mix(in srgb, var(--red), transparent 44%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(14px);
 }
 
 .topbar,
@@ -96,7 +107,7 @@ h2 {
 }
 
 .topbar {
-  padding: 20px 0;
+  padding: 16px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -108,6 +119,7 @@ h2 {
   align-items: center;
   gap: 1px;
   color: white;
+  font-size: 1.12rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   text-transform: lowercase;
@@ -719,6 +731,10 @@ h2 {
   gap: 12px;
 }
 
+.global-search-results {
+  margin: 2rem 0;
+}
+
 .global-result-card {
   display: grid;
   gap: 5px;
@@ -757,6 +773,29 @@ h2 {
   padding: 0 3px;
   background: color-mix(in srgb, var(--red), transparent 82%);
   color: var(--ink);
+}
+
+.global-result-title {
+  display: inline-block;
+  margin: 26px 0 12px;
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--red);
+  font-size: 1.1rem;
+}
+
+.external-reference-card {
+  max-width: 520px;
+}
+
+.intro-search {
+  max-width: 500px;
+  margin-top: 1.5rem;
+}
+
+.section-divider {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 3rem 0 2rem;
 }
 
 .route-card,
@@ -814,6 +853,199 @@ h2 {
   font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
+}
+
+.backend-status {
+  display: grid;
+  gap: 2px;
+  margin: 0 0 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--muted);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.backend-status strong {
+  font-size: 0.88rem;
+}
+
+.backend-status span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.backend-status.is-online {
+  border-left-color: #17803a;
+}
+
+.backend-status.is-offline {
+  border-left-color: var(--red);
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 420px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.admin-form,
+.admin-list {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.admin-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 18px;
+}
+
+.admin-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font: inherit;
+}
+
+.admin-wide,
+.admin-actions {
+  grid-column: 1 / -1;
+}
+
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-message {
+  grid-column: 1 / -1;
+  min-height: 20px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.admin-message[data-type="error"] {
+  color: var(--red);
+}
+
+.admin-message[data-type="warning"] {
+  color: #a16000;
+}
+
+.admin-list {
+  padding: 18px;
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.admin-stats span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-stats strong {
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.admin-filters {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 130px 130px 95px auto auto;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.admin-filters input,
+.admin-filters select {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font: inherit;
+}
+
+.admin-table {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-table article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.admin-table small {
+  display: block;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.admin-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.admin-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.admin-pagination span {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.secondary-button.danger {
+  border-color: color-mix(in srgb, var(--red), transparent 40%);
+  color: var(--red);
 }
 
 .section-row {
@@ -1444,4 +1676,457 @@ h2 {
 
 .founder-card dd {
   margin: 0;
+}
+
+/* === Pulido visual profesional === */
+body {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg), white 16%), var(--bg) 340px),
+    var(--bg);
+}
+
+.app-header {
+  border-bottom: 1px solid color-mix(in srgb, var(--red), transparent 44%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(14px);
+}
+
+.topbar {
+  position: relative;
+  padding: 16px 0;
+}
+
+.brand {
+  font-size: 1.12rem;
+}
+
+.menu-toggle,
+.theme-toggle {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.nav-menu {
+  padding: 18px;
+  background: var(--surface-glass);
+  border-radius: var(--radius);
+  backdrop-filter: blur(18px);
+}
+
+.nav-menu a {
+  border-radius: var(--radius);
+}
+
+.nav-menu a.is-active {
+  border-color: var(--red);
+  background: var(--red-soft);
+}
+
+.footer-links a.is-active {
+  color: var(--red);
+}
+
+.app-shell {
+  padding: 30px 0 64px;
+}
+
+.app-footer {
+  background: color-mix(in srgb, var(--surface), var(--bg) 45%);
+}
+
+.wiki-intro {
+  min-height: min(68vh, 560px);
+  margin-bottom: 28px;
+  border-radius: var(--radius);
+  background:
+    linear-gradient(90deg, rgba(10, 10, 10, 0.9), rgba(10, 10, 10, 0.58), rgba(10, 10, 10, 0.18)),
+    url("../images/portada/porsche-911-gt.jpg") center / cover no-repeat;
+}
+
+.wiki-intro::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius);
+  pointer-events: none;
+}
+
+.overview-copy,
+.stats-panel article,
+.route-card,
+.vehicle-card,
+.pilot-card,
+.founder-card,
+.action-card,
+.tool-card,
+.tool-row,
+.wiki-block,
+.fact-list {
+  box-shadow: var(--shadow-soft);
+}
+
+.overview-copy,
+.stats-panel article,
+.route-card,
+.vehicle-card,
+.pilot-card,
+.founder-card,
+.action-card,
+.tool-card,
+.tool-row,
+.room-header,
+.wiki-entry,
+.wiki-block,
+.fact-list,
+.search-input,
+.global-result-card {
+  border-radius: var(--radius);
+}
+
+.museum-section {
+  padding: 28px 0;
+}
+
+.route-grid,
+.vehicle-grid,
+.pilot-grid,
+.founder-grid,
+.quick-actions,
+.tool-grid {
+  gap: 16px;
+}
+
+.route-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.route-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-top: 4px solid var(--red);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.route-card:hover,
+.vehicle-card:hover,
+.action-card:hover,
+.tool-card:hover,
+.recommended-link:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.room-header {
+  padding: clamp(22px, 4vw, 34px);
+  background:
+    linear-gradient(135deg, var(--surface), color-mix(in srgb, var(--surface-soft), var(--red) 4%));
+}
+
+.primary-button {
+  border: 1px solid var(--red);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--red), transparent 74%);
+}
+
+.secondary-button,
+.back-link,
+.room-tabs a {
+  box-shadow: 0 6px 14px rgba(29, 29, 29, 0.04);
+}
+
+.vehicle-card {
+  background:
+    linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--surface), var(--surface-soft) 68%));
+}
+
+.image-frame {
+  aspect-ratio: 4 / 3;
+  padding: 10px;
+}
+
+.image-frame img {
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.12));
+  transition: transform 0.25s ease;
+}
+
+.vehicle-card:hover .image-frame img {
+  transform: scale(1.035);
+}
+
+.image-frame.missing-image {
+  background:
+    linear-gradient(135deg, var(--image-bg), color-mix(in srgb, var(--image-bg), var(--red) 10%));
+}
+
+.vehicle-info {
+  padding: 14px;
+}
+
+.vehicle-info h3 {
+  font-size: 1rem;
+}
+
+.card-action {
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.wiki-layout {
+  grid-template-columns: minmax(250px, 350px) minmax(0, 1fr);
+}
+
+.wiki-media {
+  top: 92px;
+}
+
+.wiki-content {
+  gap: 18px;
+}
+
+.main-story {
+  border-left: 4px solid var(--red);
+}
+
+.admin-form,
+.admin-list {
+  box-shadow: var(--shadow-soft);
+}
+
+/* === Microinteracciones y refinamiento final === */
+::selection {
+  background: var(--red);
+  color: #ffffff;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body::-webkit-scrollbar,
+.nav-menu::-webkit-scrollbar,
+.global-search-panel::-webkit-scrollbar {
+  width: 10px;
+}
+
+body::-webkit-scrollbar-thumb,
+.nav-menu::-webkit-scrollbar-thumb,
+.global-search-panel::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--red), transparent 35%);
+  border: 3px solid var(--bg);
+  border-radius: 999px;
+}
+
+.topbar::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: min(1120px, calc(100vw - 32px));
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.menu-toggle,
+.theme-toggle,
+.primary-button,
+.secondary-button,
+.back-link,
+.room-tabs a,
+.favorite-filter {
+  user-select: none;
+}
+
+.menu-toggle:active,
+.theme-toggle:active,
+.primary-button:active,
+.secondary-button:active,
+.back-link:active,
+.room-tabs a:active,
+.favorite-filter:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.wiki-intro .search-input {
+  min-height: 54px;
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+}
+
+.home-summary {
+  align-items: stretch;
+}
+
+.recommended-link {
+  border-left: 4px solid var(--red);
+}
+
+.stats-panel article {
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-panel article::after {
+  content: "";
+  position: absolute;
+  right: -18px;
+  bottom: -28px;
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  background: var(--red-soft);
+}
+
+.stats-panel strong,
+.stats-panel span {
+  position: relative;
+  z-index: 1;
+}
+
+.tool-row {
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-row::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--red);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.tool-row:hover::before,
+.tool-row.is-active::before {
+  opacity: 1;
+}
+
+.route-card[data-area="autos"]::before {
+  border-top-color: var(--red);
+}
+
+.route-card[data-area="motos"]::before {
+  border-top-color: #16784a;
+}
+
+.route-card[data-area="aviones"]::before {
+  border-top-color: #2f6fbd;
+}
+
+.vehicle-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: border-color 0.2s ease;
+}
+
+.vehicle-card:hover::after {
+  border-color: color-mix(in srgb, var(--red), transparent 35%);
+}
+
+.source-badge {
+  position: absolute;
+  z-index: 3;
+  left: 10px;
+  top: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.64);
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: rgba(29, 29, 29, 0.72);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+.vehicle-meta span {
+  max-width: 100%;
+}
+
+.wiki-title {
+  position: relative;
+}
+
+.wiki-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 96px;
+  height: 3px;
+  background: var(--red);
+}
+
+.fact-list dt {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+}
+
+.fact-list dd,
+.wiki-content p,
+.wiki-content li {
+  overflow-wrap: anywhere;
+}
+
+.comparison-table div:first-child strong,
+.comparison-table div:first-child span {
+  background: color-mix(in srgb, var(--surface), var(--red) 4%);
+}
+
+.admin-form {
+  position: sticky;
+  top: 96px;
+}
+
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus,
+.admin-filters input:focus,
+.admin-filters select:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red), transparent 84%);
+  outline: none;
+}
+
+.admin-table article {
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-table article:hover {
+  border-color: var(--red);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+.admin-row-actions .secondary-button {
+  margin-top: 0;
+}
+
+.empty-state.compact {
+  padding: 12px 14px;
+}
+
+.app-loading {
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--red);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+  box-shadow: var(--shadow-soft);
+  font-weight: 800;
+  text-align: center;
 }

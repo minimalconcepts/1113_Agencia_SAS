@@ -1,0 +1,17 @@
+{
+  "name": "ilovewheels-backend",
+  "version": "1.0.0",
+  "description": "Backend simple para la wiki de autos, motos y aviones.",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "seed": "node backend/seed.js",
+    "import:local": "node backend/import-local-data.js",
+    "check": "node backend/check-syntax.js"
+  },
+  "dependencies": {
+    "express": "^4.18.3",
+    "sqlite3": "^5.1.7"
+  }
+}

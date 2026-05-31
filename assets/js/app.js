@@ -13,6 +13,29 @@ let terminoBusqueda = "";
 let terminoBusquedaGlobal = "";
 let ordenamientoActual = localStorage.getItem(ORDER_KEY) || "defecto";
 let soloFavoritos = false;
+let apiSearchTimer;
+let apiSearchState = {
+  query: "",
+  loading: false,
+  result: null,
+  error: ""
+};
+let backendState = {
+  checked: false,
+  connected: false,
+  vehicles: [],
+  meta: null,
+  message: "Modo local"
+};
+let adminPendingDeleteId = null;
+let adminFilters = {
+  q: "",
+  categoria: "",
+  sort: "id",
+  order: "desc",
+  page: 1,
+  limit: 50
+};
 // Cambia image por la ruta final de cada afiche dentro de assets/images/easter-egg.
 const EASTER_EGG_CARDS = [
   {
@@ -160,12 +183,14 @@ if (menuToggle && navMenu) {
   const closeMenu = () => {
     navMenu.classList.remove("is-open");
     menuToggle.setAttribute("aria-expanded", "false");
+    menuToggle.setAttribute("aria-label", "Abrir menu principal");
     menuToggle.textContent = "Menu principal";
   };
 
   const openMenu = () => {
     navMenu.classList.add("is-open");
     menuToggle.setAttribute("aria-expanded", "true");
+    menuToggle.setAttribute("aria-label", "Cerrar menu principal");
     menuToggle.textContent = "Cerrar menu";
   };
 
@@ -205,6 +230,7 @@ if (menuToggle && navMenu) {
 
 function renderApp() {
   const path = window.AppRouter.getCurrentPath();
+  setCurrentRouteUi(path);
 
   if (path === "/") {
     renderHome();
@@ -231,6 +257,11 @@ function renderApp() {
     return;
   }
 
+  if (path === "/admin") {
+    renderAdmin();
+    return;
+  }
+
   if (path === "/easter-egg") {
     renderEasterEggPage();
     return;
@@ -249,6 +280,17 @@ function renderApp() {
   }
 
   renderRoom(route);
+}
+
+function setCurrentRouteUi(path) {
+  document.body.dataset.route = path === "/" ? "home" : path.split("/").filter(Boolean)[0] || "home";
+
+  document.querySelectorAll(".nav-menu a, .footer-links a").forEach((link) => {
+    const href = link.getAttribute("href") || "";
+    const linkPath = href.replace("#", "") || "/";
+    const isActive = linkPath === path || (path.startsWith(linkPath) && linkPath !== "/");
+    link.classList.toggle("is-active", isActive);
+  });
 }
 
 function renderHome() {
@@ -285,28 +327,28 @@ function renderHome() {
     const totalResults = filteredItems.length + filteredPilots.length + filteredFounders.length;
 
     searchResultsHtml = `
-      <section class="global-search-results" style="margin: 2rem 0;">
+      <section class="global-search-results">
         <div class="section-heading">
           <p class="eyebrow">Resultados de la búsqueda global</p>
           <h2>${totalResults} ${totalResults === 1 ? "coincidencia encontrada" : "coincidencias encontradas"} para "${escapeHtml(terminoBusquedaGlobal)}"</h2>
         </div>
         
         ${filteredItems.length > 0 ? `
-          <h3 style="margin: 1.5rem 0 1rem 0; font-size: 1.3rem; border-bottom: 2px solid var(--accent-color, #cd1a1a); display: inline-block; padding-bottom: 0.2rem;">Piezas encontradas</h3>
+          <h3 class="global-result-title">Piezas encontradas</h3>
           <div class="vehicle-grid">
             ${filteredItems.map((entry) => renderVehicleCard(entry.item)).join("")}
           </div>
         ` : ""}
 
         ${filteredPilots.length > 0 ? `
-          <h3 style="margin: 2.5rem 0 1rem 0; font-size: 1.3rem; border-bottom: 2px solid var(--accent-color, #cd1a1a); display: inline-block; padding-bottom: 0.2rem;">Pilotos encontrados</h3>
+          <h3 class="global-result-title">Pilotos encontrados</h3>
           <div class="pilot-grid">
             ${filteredPilots.map(renderPilotCard).join("")}
           </div>
         ` : ""}
 
         ${filteredFounders.length > 0 ? `
-          <h3 style="margin: 2.5rem 0 1rem 0; font-size: 1.3rem; border-bottom: 2px solid var(--accent-color, #cd1a1a); display: inline-block; padding-bottom: 0.2rem;">Creadores de marcas</h3>
+          <h3 class="global-result-title">Creadores de marcas</h3>
           <div class="founder-grid">
             ${filteredFounders.map(renderFounderCard).join("")}
           </div>
@@ -315,7 +357,8 @@ function renderHome() {
         ${totalResults === 0 ? `
           <p class="empty-state">No se encontraron resultados en ninguna sección para esa búsqueda.</p>
         ` : ""}
-        <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 3rem 0 2rem 0;" />
+        ${renderApiSearchResult()}
+        <hr class="section-divider" />
       </section>
     `;
   }
@@ -327,7 +370,7 @@ function renderHome() {
         <h1>Museo digital de autos, motos y aviones.</h1>
         <p>Explora maquinas legendarias por categorias, guarda tus favoritas y abre cada ficha como una pagina tipo Wikipedia para estudiar su historia.</p>
         
-        <div class="search-container" style="margin-top: 1.5rem; max-width: 500px;">
+        <div class="search-container intro-search">
           <input
             type="text"
             id="busqueda-global"
@@ -368,11 +411,13 @@ function renderHome() {
           <p class="eyebrow">Herramientas</p>
           <h2>Aprende y guarda</h2>
         </div>
+        ${renderBackendStatus()}
         <div class="tool-list">
           <a class="tool-row" href="#/random"><span>01</span><strong>Randomizador</strong><small>Elige una pieza al azar.</small></a>
           <a class="tool-row" href="#/favoritos"><span>02</span><strong>Favoritos</strong><small>Revisa tu coleccion.</small></a>
           <a class="tool-row" href="#/pilotos"><span>03</span><strong>Pilotos</strong><small>Figuras importantes.</small></a>
           <a class="tool-row" href="#/fundadores"><span>04</span><strong>Creadores</strong><small>Fundadores de marcas.</small></a>
+          <a class="tool-row" href="#/admin"><span>05</span><strong>Admin</strong><small>Gestiona SQLite.</small></a>
         </div>
       </aside>
 
@@ -408,10 +453,11 @@ function renderSection(section) {
 
 function renderRouteCard(route) {
   const room = window.MUSEUM_DATA.routes[route.path];
-  const itemCount = room ? room.items.length : 0;
+  const itemCount = room ? getRoomItems(room).length : 0;
+  const areaSlug = room ? createSlug(room.area) : "general";
 
   return `
-    <a class="route-card" href="#${route.path}">
+    <a class="route-card" data-area="${areaSlug}" href="#${route.path}">
       <span>Sala</span>
       <strong>${route.label}</strong>
       <small>${itemCount} piezas registradas</small>
@@ -421,7 +467,8 @@ function renderRouteCard(route) {
 
 function renderRoom(route) {
   const relatedRoutes = getRoutesByArea(route.area);
-  const filteredItems = ordenarVehiculos(filterRoomItems(route.items));
+  const roomItems = getRoomItems(route);
+  const filteredItems = ordenarVehiculos(filterRoomItems(roomItems));
 
   app.innerHTML = `
     <section class="room-header ${route.area.toLowerCase()}">
@@ -443,10 +490,10 @@ function renderRoom(route) {
     <section class="vehicle-section">
       <div class="section-heading">
         <p class="eyebrow">Registrados</p>
-        <h2>${route.items.length === 0 ? "Sala preparada" : "Piezas de la sala"}</h2>
+        <h2>${roomItems.length === 0 ? "Sala preparada" : "Piezas de la sala"}</h2>
       </div>
       ${
-        route.items.length === 0
+        roomItems.length === 0
           ? `<p class="empty-state">Todavia no hay elementos registrados. Agrega imagenes en <strong>${route.folder}</strong> y despues crea una tarjeta en <strong>assets/js/data.js</strong>.</p>`
           : `
             <div class="search-container">
@@ -459,7 +506,7 @@ function renderRoom(route) {
                 aria-label="Buscar piezas en esta sala"
                 autocomplete="off"
               />
-              <p class="search-counter" id="contador-busqueda">${getSearchCounterText(filteredItems.length, route.items.length)}</p>
+              <p class="search-counter" id="contador-busqueda">${getSearchCounterText(filteredItems.length, roomItems.length)}</p>
             </div>
             <div class="ordenamiento-container">
               <label for="ordenamiento">Ordenar por:</label>
@@ -492,12 +539,14 @@ function renderRoom(route) {
 function renderVehicleCard(item) {
   const slug = createSlug(item.name);
   const favorite = isFavorite(slug);
+  const source = item.source ? String(item.source) : "";
 
   return `
-    <article class="vehicle-card">
+    <article class="vehicle-card" ${source ? `data-source="${escapeHtml(source)}"` : ""}>
       <button class="favorite-button ${favorite ? "is-active" : ""}" type="button" onclick="toggleFavorite('${slug}')" aria-label="${favorite ? "Quitar de favoritos" : "Agregar a favoritos"}">
         <span aria-hidden="true">${favorite ? "&#9829;" : "&#9825;"}</span>
       </button>
+      ${source ? `<span class="source-badge">${escapeHtml(source)}</span>` : ""}
       <a class="vehicle-link" href="#/wiki/${slug}" aria-label="Abrir historia de ${item.name}">
         <div class="image-frame">
           <img src="${item.image}" alt="${item.name}" loading="lazy" decoding="async" onerror="this.remove(); this.parentElement.classList.add('missing-image'); this.parentElement.innerHTML='Imagen pendiente';" />
@@ -542,6 +591,7 @@ function setupGlobalSearch() {
 
   searchInput.addEventListener("input", (event) => {
     terminoBusquedaGlobal = event.target.value;
+    scheduleApiSearch(terminoBusquedaGlobal);
     renderHome();
     
     // Mantiene el foco estable en la barra global mientras escribes
@@ -551,6 +601,151 @@ function setupGlobalSearch() {
       input.setSelectionRange(input.value.length, input.value.length);
     }
   });
+}
+
+function scheduleApiSearch(query) {
+  clearTimeout(apiSearchTimer);
+  const cleanQuery = query.trim();
+
+  if (!cleanQuery) {
+    apiSearchState = { query: "", loading: false, result: null, error: "" };
+    return;
+  }
+
+  apiSearchState = { query: cleanQuery, loading: true, result: null, error: "" };
+
+  apiSearchTimer = setTimeout(() => {
+    searchExternalReference(cleanQuery);
+  }, 550);
+}
+
+async function searchExternalReference(query) {
+  try {
+    const result = await window.MuseumApi.searchReference(query);
+
+    if (apiSearchState.query !== query) {
+      return;
+    }
+
+    apiSearchState = { query, loading: false, result, error: "" };
+  } catch (error) {
+    if (apiSearchState.query !== query) {
+      return;
+    }
+
+    apiSearchState = {
+      query,
+      loading: false,
+      result: null,
+      error: "Prende el backend para ver referencias externas."
+    };
+  }
+
+  if (window.AppRouter.getCurrentPath() === "/") {
+    renderHome();
+  }
+}
+
+function renderApiSearchResult() {
+  if (!terminoBusquedaGlobal.trim()) {
+    return "";
+  }
+
+  if (apiSearchState.loading) {
+    return `<p class="empty-state compact">Buscando referencia externa en el backend...</p>`;
+  }
+
+  if (apiSearchState.error) {
+    return `<p class="empty-state compact">${apiSearchState.error}</p>`;
+  }
+
+  if (!apiSearchState.result) {
+    return "";
+  }
+
+  return `
+    <h3 class="global-result-title">Referencia externa</h3>
+    <a class="global-result-card external-reference-card" href="${escapeHtml(apiSearchState.result.url_referencia)}" target="_blank" rel="noopener noreferrer">
+      <span>${escapeHtml(apiSearchState.result.fuente || "Fuente externa")}</span>
+      <strong>${escapeHtml(apiSearchState.result.nombre)}</strong>
+      <small>${escapeHtml(apiSearchState.result.descripcion)}</small>
+    </a>
+  `;
+}
+
+function renderBackendStatus() {
+  const statusClass = backendState.connected ? "is-online" : "is-offline";
+  const statusText = backendState.connected ? "Backend conectado" : "Modo local";
+
+  return `
+    <div class="backend-status ${statusClass}" aria-live="polite">
+      <strong>${statusText}</strong>
+      <span>${backendState.message}</span>
+    </div>
+  `;
+}
+
+function getRoomItems(route) {
+  return [
+    ...route.items,
+    ...getApiItemsForRoute(route)
+  ];
+}
+
+function getApiItemsForRoute(route) {
+  if (!backendState.connected || backendState.vehicles.length === 0) {
+    return [];
+  }
+
+  const category = normalizeCategory(route.area);
+
+  return backendState.vehicles
+    .filter((vehicle) => normalizeCategory(vehicle.categoria) === category)
+    .map((vehicle) => mapApiVehicleToItem(vehicle, route));
+}
+
+function normalizeCategory(value) {
+  const text = String(value || "").toLowerCase();
+
+  if (text.includes("auto")) {
+    return "autos";
+  }
+
+  if (text.includes("moto")) {
+    return "motos";
+  }
+
+  if (text.includes("avion") || text.includes("avi")) {
+    return "aviones";
+  }
+
+  return text;
+}
+
+function mapApiVehicleToItem(vehicle, route) {
+  return {
+    name: vehicle.nombre,
+    type: vehicle.marca || vehicle.categoria || "Registro API",
+    year: vehicle.anio ? String(vehicle.anio) : "Pendiente",
+    detail: vehicle.velocidad || "Registro guardado en SQLite",
+    image: vehicle.imagen || "",
+    history: vehicle.descripcion || "Registro creado desde el backend SQLite.",
+    category: vehicle.categoria,
+    source: "SQLite",
+    apiId: vehicle.id,
+    url_referencia: vehicle.url_referencia,
+    learning: {
+      level: "Basico",
+      summary: "Pieza cargada desde el backend y disponible para ampliar desde el panel admin.",
+      keyConcepts: ["Backend", "SQLite", route.area],
+      questions: ["Que dato falta completar?", "Que fuente valida se puede agregar?"]
+    },
+    specs: {
+      creator: vehicle.marca || "Pendiente",
+      topSpeed: vehicle.velocidad || "Pendiente",
+      importance: "Registro integrado desde SQLite."
+    }
+  };
 }
 
 function aplicarOrdenamiento() {
@@ -580,7 +775,8 @@ function toggleSoloFavoritos() {
 }
 
 function updateRoomResults(route) {
-  const filteredItems = ordenarVehiculos(filterRoomItems(route.items));
+  const roomItems = getRoomItems(route);
+  const filteredItems = ordenarVehiculos(filterRoomItems(roomItems));
   const results = document.getElementById("vehicle-results");
   const counter = document.getElementById("contador-busqueda");
   const favoriteFilter = document.getElementById("btn-solo-favoritos");
@@ -590,7 +786,7 @@ function updateRoomResults(route) {
   }
 
   if (counter) {
-    counter.textContent = getSearchCounterText(filteredItems.length, route.items.length);
+    counter.textContent = getSearchCounterText(filteredItems.length, roomItems.length);
   }
 
   if (favoriteFilter) {
@@ -691,7 +887,11 @@ function getSearchableVehicleText(item) {
     item.collaboration,
     item.history,
     item.learning,
-    item.specs
+    item.specs,
+    item.url_referencia,
+    item.urlReferencia,
+    item.officialUrl,
+    item.referenceUrl
   ]
     .map(stringifySearchValue)
     .join(" ")
@@ -834,6 +1034,7 @@ function renderWikiDetail(path) {
 
   const { item, roomPath, route } = result;
   const favorite = isFavorite(slug);
+  const referenceUrl = getReferenceUrl(item);
   const relatedItems = route.items
     .filter((candidate) => createSlug(candidate.name) !== slug)
     .map((candidate) => ({
@@ -849,6 +1050,7 @@ function renderWikiDetail(path) {
           <span aria-hidden="true">${favorite ? "&#9829;" : "&#9825;"}</span>
           ${favorite ? "Quitar de favoritos" : "Agregar a favoritos"}
         </button>
+        ${referenceUrl ? `<a class="secondary-button" href="${escapeHtml(referenceUrl)}" target="_blank" rel="noopener noreferrer">Referencia</a>` : ""}
       </div>
 
       <header class="wiki-title">
@@ -999,6 +1201,10 @@ function getComparisonValue(item, row) {
   return value || "Pendiente";
 }
 
+function getReferenceUrl(item) {
+  return item.url_referencia || item.urlReferencia || item.officialUrl || item.referenceUrl || "";
+}
+
 function renderFavorites() {
   const favoriteSlugs = getFavorites();
   const favoriteItems = getAllItems().filter((entry) => favoriteSlugs.includes(entry.slug));
@@ -1123,6 +1329,317 @@ function renderFounders() {
   `;
 }
 
+function renderAdmin() {
+  const vehicles = backendState.vehicles;
+
+  app.innerHTML = `
+    <section class="room-header">
+      <a class="back-link" href="#/">Regresar</a>
+      <p class="eyebrow">Panel interno</p>
+      <h1>Admin SQLite</h1>
+      <p>Gestiona vehiculos guardados en el backend. Si el backend no esta prendido, esta vista queda en modo lectura local.</p>
+      ${renderBackendStatus()}
+    </section>
+
+    <section class="admin-layout">
+      <form class="admin-form" id="admin-vehicle-form">
+        <input type="hidden" name="id" />
+        <label>Nombre<input name="nombre" required placeholder="Ferrari F40" /></label>
+        <label>Categoria
+          <select name="categoria" required>
+            <option value="autos">Autos</option>
+            <option value="motos">Motos</option>
+            <option value="aviones">Aviones</option>
+          </select>
+        </label>
+        <label>Marca<input name="marca" placeholder="Ferrari" /></label>
+        <label>Anio<input name="anio" type="number" min="1880" max="2100" placeholder="1987" /></label>
+        <label>Velocidad<input name="velocidad" placeholder="324 km/h" /></label>
+        <label>Imagen<input name="imagen" placeholder="https://... o assets/images/..." /></label>
+        <label>URL referencia<input name="url_referencia" placeholder="https://..." /></label>
+        <label class="admin-wide">Descripcion<textarea name="descripcion" rows="4" placeholder="Resumen corto para la ficha"></textarea></label>
+        <div class="admin-actions">
+          <button class="primary-button" type="submit" ${backendState.connected ? "" : "disabled"}>Guardar</button>
+          <button class="secondary-button" type="button" onclick="resetAdminForm()">Limpiar</button>
+          <button class="secondary-button" type="button" onclick="refreshAdminPanel()">Actualizar</button>
+          <button class="secondary-button" type="button" onclick="exportAdminVehicles()" ${backendState.connected && vehicles.length > 0 ? "" : "disabled"}>Exportar JSON</button>
+        </div>
+        <p class="admin-message" id="admin-message" aria-live="polite"></p>
+      </form>
+
+      <section class="admin-list">
+        <div class="section-heading compact">
+          <p class="eyebrow">SQLite</p>
+          <h2>${getAdminTotalText()}</h2>
+        </div>
+        ${renderAdminStats()}
+        ${renderAdminFilters()}
+        ${
+          backendState.connected
+            ? renderAdminVehicleList(vehicles)
+            : `<p class="empty-state">Prende el servidor con npm.cmd start para crear, editar o borrar registros.</p>`
+        }
+      </section>
+    </section>
+  `;
+
+  setupAdminForm();
+  setupAdminFilters();
+}
+
+function getAdminTotalText() {
+  if (!backendState.meta) {
+    return `${backendState.vehicles.length} registros`;
+  }
+
+  return `${backendState.meta.total} registros`;
+}
+
+function renderAdminStats() {
+  const counters = backendState.vehicles.reduce((accumulator, vehicle) => {
+    accumulator[vehicle.categoria] = (accumulator[vehicle.categoria] || 0) + 1;
+    return accumulator;
+  }, {});
+
+  return `
+    <div class="admin-stats" aria-label="Resumen de registros visibles">
+      <span><strong>${backendState.vehicles.length}</strong> visibles</span>
+      <span><strong>${counters.autos || 0}</strong> autos</span>
+      <span><strong>${counters.motos || 0}</strong> motos</span>
+      <span><strong>${counters.aviones || 0}</strong> aviones</span>
+    </div>
+  `;
+}
+
+function renderAdminFilters() {
+  return `
+    <form class="admin-filters" id="admin-filters-form">
+      <input name="q" value="${escapeHtml(adminFilters.q)}" placeholder="Buscar por nombre, marca o descripcion" />
+      <select name="categoria">
+        <option value="">Todas</option>
+        <option value="autos" ${adminFilters.categoria === "autos" ? "selected" : ""}>Autos</option>
+        <option value="motos" ${adminFilters.categoria === "motos" ? "selected" : ""}>Motos</option>
+        <option value="aviones" ${adminFilters.categoria === "aviones" ? "selected" : ""}>Aviones</option>
+      </select>
+      <select name="sort" aria-label="Ordenar por">
+        <option value="id" ${adminFilters.sort === "id" ? "selected" : ""}>Recientes</option>
+        <option value="nombre" ${adminFilters.sort === "nombre" ? "selected" : ""}>Nombre</option>
+        <option value="marca" ${adminFilters.sort === "marca" ? "selected" : ""}>Marca</option>
+        <option value="anio" ${adminFilters.sort === "anio" ? "selected" : ""}>Anio</option>
+        <option value="updated_at" ${adminFilters.sort === "updated_at" ? "selected" : ""}>Actualizacion</option>
+      </select>
+      <select name="order" aria-label="Direccion del orden">
+        <option value="desc" ${adminFilters.order === "desc" ? "selected" : ""}>Desc</option>
+        <option value="asc" ${adminFilters.order === "asc" ? "selected" : ""}>Asc</option>
+      </select>
+      <button class="secondary-button" type="submit">Filtrar</button>
+      <button class="secondary-button" type="button" onclick="clearAdminFilters()">Limpiar filtros</button>
+    </form>
+  `;
+}
+
+function renderAdminVehicleList(vehicles) {
+  if (vehicles.length === 0) {
+    return `<p class="empty-state">No hay vehiculos en SQLite. Usa el formulario o ejecuta npm.cmd run seed.</p>`;
+  }
+
+  return `
+    <div class="admin-table">
+      ${vehicles.map((vehicle) => `
+        <article>
+          <div>
+            <strong>${escapeHtml(vehicle.nombre)}</strong>
+            <small>${escapeHtml(vehicle.categoria)} | ${escapeHtml(vehicle.marca || "Marca pendiente")}</small>
+            <small>Actualizado: ${formatDate(vehicle.updated_at || vehicle.created_at)}</small>
+          </div>
+          <div class="admin-row-actions">
+            <button class="secondary-button" type="button" onclick="editAdminVehicle(${vehicle.id})">Editar</button>
+            <button class="secondary-button danger" type="button" onclick="deleteAdminVehicle(${vehicle.id})">
+              ${adminPendingDeleteId === vehicle.id ? "Confirmar" : "Borrar"}
+            </button>
+          </div>
+        </article>
+      `).join("")}
+    </div>
+    ${renderAdminPagination()}
+  `;
+}
+
+function renderAdminPagination() {
+  const meta = backendState.meta;
+
+  if (!meta || meta.totalPages <= 1) {
+    return "";
+  }
+
+  return `
+    <div class="admin-pagination">
+      <button class="secondary-button" type="button" onclick="changeAdminPage(${meta.page - 1})" ${meta.page <= 1 ? "disabled" : ""}>Anterior</button>
+      <span>Pagina ${meta.page} de ${meta.totalPages}</span>
+      <button class="secondary-button" type="button" onclick="changeAdminPage(${meta.page + 1})" ${meta.page >= meta.totalPages ? "disabled" : ""}>Siguiente</button>
+    </div>
+  `;
+}
+
+function setupAdminForm() {
+  const form = document.getElementById("admin-vehicle-form");
+
+  if (!form) {
+    return;
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(form);
+    const id = formData.get("id");
+    const vehicle = Object.fromEntries(formData.entries());
+
+    if (!vehicle.anio) {
+      delete vehicle.anio;
+    }
+
+    try {
+      if (id) {
+        await window.MuseumApi.updateVehicle(id, vehicle);
+      } else {
+        await window.MuseumApi.createVehicle(vehicle);
+      }
+
+      await refreshBackendData();
+      renderAdmin();
+    } catch (error) {
+      showAdminMessage(error.message || "No se pudo guardar. Revisa los campos y que el backend este prendido.", "error");
+    }
+  });
+}
+
+function setupAdminFilters() {
+  const form = document.getElementById("admin-filters-form");
+
+  if (!form) {
+    return;
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(form);
+    adminFilters.q = String(formData.get("q") || "").trim();
+    adminFilters.categoria = String(formData.get("categoria") || "");
+    adminFilters.sort = String(formData.get("sort") || "id");
+    adminFilters.order = String(formData.get("order") || "desc");
+    adminFilters.page = 1;
+    await refreshAdminPanel();
+  });
+}
+
+async function clearAdminFilters() {
+  adminFilters = { q: "", categoria: "", sort: "id", order: "desc", page: 1, limit: 50 };
+  await refreshAdminPanel();
+}
+
+async function changeAdminPage(page) {
+  adminFilters.page = Math.max(page, 1);
+  await refreshAdminPanel();
+}
+
+function editAdminVehicle(id) {
+  const vehicle = backendState.vehicles.find((current) => current.id === id);
+  const form = document.getElementById("admin-vehicle-form");
+
+  if (!vehicle || !form) {
+    return;
+  }
+
+  form.elements.id.value = vehicle.id;
+  form.elements.nombre.value = vehicle.nombre || "";
+  form.elements.categoria.value = vehicle.categoria || "autos";
+  form.elements.marca.value = vehicle.marca || "";
+  form.elements.anio.value = vehicle.anio || "";
+  form.elements.velocidad.value = vehicle.velocidad || "";
+  form.elements.imagen.value = vehicle.imagen || "";
+  form.elements.url_referencia.value = vehicle.url_referencia || "";
+  form.elements.descripcion.value = vehicle.descripcion || "";
+  form.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function resetAdminForm() {
+  const form = document.getElementById("admin-vehicle-form");
+
+  if (form) {
+    form.reset();
+    form.elements.id.value = "";
+  }
+}
+
+async function deleteAdminVehicle(id) {
+  const vehicle = backendState.vehicles.find((current) => current.id === id);
+
+  if (!vehicle) {
+    return;
+  }
+
+  if (adminPendingDeleteId !== id) {
+    adminPendingDeleteId = id;
+    renderAdmin();
+    showAdminMessage(`Pulsa Confirmar para borrar ${vehicle.nombre}.`, "warning");
+    return;
+  }
+
+  try {
+    await window.MuseumApi.deleteVehicle(id);
+    adminPendingDeleteId = null;
+    await refreshBackendData();
+    renderAdmin();
+  } catch (error) {
+    showAdminMessage(error.message || "No se pudo borrar el registro.", "error");
+  }
+}
+
+async function refreshAdminPanel() {
+  await refreshBackendData();
+  renderAdmin();
+}
+
+function showAdminMessage(message, type = "info") {
+  const element = document.getElementById("admin-message");
+
+  if (!element) {
+    return;
+  }
+
+  element.textContent = message;
+  element.dataset.type = type;
+}
+
+async function exportAdminVehicles() {
+  let payload;
+
+  try {
+    payload = await window.MuseumApi.exportVehicles(adminFilters);
+  } catch (error) {
+    payload = {
+      exportedAt: new Date().toISOString(),
+      total: backendState.meta?.total ?? backendState.vehicles.length,
+      filters: adminFilters,
+      data: backendState.vehicles
+    };
+    showAdminMessage("No se pudo exportar desde API. Se genero copia visible.", "warning");
+  }
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "ilovewheels-vehiculos.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  showAdminMessage(`Exportacion JSON generada con ${payload.total} registros.`, "info");
+}
+
 function renderEasterEggPage() {
   app.innerHTML = `
     <section class="room-header easter-egg-page">
@@ -1220,7 +1737,7 @@ function renderFounderCard(founder) {
 
 function getAllItems() {
   return Object.entries(window.MUSEUM_DATA.routes).flatMap(([roomPath, route]) =>
-    route.items.map((item) => ({
+    getRoomItems(route).map((item) => ({
       item,
       route,
       roomPath,
@@ -1292,6 +1809,24 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;");
 }
 
+function formatDate(value) {
+  if (!value) {
+    return "Pendiente";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return date.toLocaleDateString("es-CO", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit"
+  });
+}
+
 function renderNotFound(path) {
   app.innerHTML = `
     <section class="hero-panel">
@@ -1311,11 +1846,60 @@ function handleRouteChange() {
   });
 }
 
+async function refreshBackendData() {
+  if (!window.MuseumApi) {
+    backendState = {
+      checked: true,
+      connected: false,
+      vehicles: [],
+      meta: null,
+      message: "Cliente API no disponible"
+    };
+    return;
+  }
+
+  try {
+    await window.MuseumApi.health();
+    const result = await window.MuseumApi.listVehiclesPage(adminFilters);
+    backendState = {
+      checked: true,
+      connected: true,
+      vehicles: result.data,
+      meta: result.meta,
+      message: `${result.meta.total} registros en SQLite`
+    };
+  } catch (error) {
+    backendState = {
+      checked: true,
+      connected: false,
+      vehicles: [],
+      meta: null,
+      message: "Backend apagado o no disponible"
+    };
+  }
+}
+
+async function bootstrapApp() {
+  renderApp();
+  await refreshBackendData();
+
+  if (window.AppRouter.getCurrentPath() === "/admin" || backendState.connected) {
+    renderApp();
+  }
+}
+
 window.toggleFavorite = toggleFavorite;
 window.renderRandomizer = renderRandomizer;
 window.renderComparison = renderComparison;
 window.showEasterEggContent = showEasterEggContent;
 window.aplicarOrdenamiento = aplicarOrdenamiento;
 window.toggleSoloFavoritos = toggleSoloFavoritos;
+window.editAdminVehicle = editAdminVehicle;
+window.deleteAdminVehicle = deleteAdminVehicle;
+window.resetAdminForm = resetAdminForm;
+window.refreshAdminPanel = refreshAdminPanel;
+window.clearAdminFilters = clearAdminFilters;
+window.changeAdminPage = changeAdminPage;
+window.exportAdminVehicles = exportAdminVehicles;
 window.AppRouter.onChange(handleRouteChange);
-renderApp();
+bootstrapApp();

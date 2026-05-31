@@ -315,6 +315,10 @@
                 <strong>Creadores de marcas</strong>
                 <small>Origen de marcas historicas</small>
               </a>
+              <a class="menu-link magic-burst-btn" href="#/admin">
+                <strong>Admin SQLite</strong>
+                <small>Gestionar registros del backend</small>
+              </a>
             </section>
           </div>
         </div>
@@ -322,7 +326,9 @@
     </nav>
   </header>
 
-  <main id="app" class="app-shell" aria-live="polite"></main>
+  <main id="app" class="app-shell" aria-live="polite">
+    <p class="app-loading">Cargando museo...</p>
+  </main>
 
   <footer class="app-footer">
     <div class="footer-inner">
@@ -335,12 +341,10 @@
         <a href="#/random">Randomizador</a>
         <a href="#/favoritos">Favoritos</a>
         <a href="#/fundadores">Fundadores</a>
+        <a href="#/admin">Admin</a>
       </nav>
     </div>
   </footer>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -693,8 +697,32 @@
     });
   </script>
 
-  <script src="assets/js/data.js"></script>
-  <script src="assets/js/router.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script>
+    (() => {
+      const scripts = [
+        "assets/js/data.js",
+        "assets/js/router.js",
+        "assets/js/api.js",
+        "assets/js/app.js"
+      ];
+
+      const loadScript = (src) => new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error(`No se pudo cargar ${src}`));
+        document.body.appendChild(script);
+      });
+
+      scripts.reduce((chain, src) => chain.then(() => loadScript(src)), Promise.resolve())
+        .catch((error) => {
+          const app = document.getElementById("app");
+          if (app) {
+            app.innerHTML = '<p class="empty-state">No se pudo cargar la app. Revisa que el servidor este prendido y actualiza la pagina.</p>';
+          }
+          console.error(error);
+        });
+    })();
+  </script>
 </body>
 </html>
